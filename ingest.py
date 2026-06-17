@@ -1,40 +1,91 @@
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
+from langchain_core.documents import Document
+import re
+import shutil
 import os
 
-PDF_PATH = "data/Addy Compressed Python Questions.pdf"
+PDF_FOLDER = "data"
 DB_DIR = "db"
 
-print("Loading PDF...")
+# ----------------------------------
+# DELETE OLD VECTOR DB
+# ----------------------------------
 
-loader = PyPDFLoader(PDF_PATH)
-documents = loader.load()
+if os.path.exists(DB_DIR):
+    shutil.rmtree(DB_DIR)
 
-print(f"Loaded {len(documents)} pages")
+documents = []
 
-splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,
-    chunk_overlap=50
-)
+print("Loading PDFs...")
 
-chunks = splitter.split_documents(documents)
+# ----------------------------------
+# LOAD ALL PDFS
+# ----------------------------------
 
-print(f"Created {len(chunks)} chunks")
+for file in os.listdir(PDF_FOLDER):
+
+    if file.lower().endswith(".pdf"):
+
+        pdf_path = os.path.join(PDF_FOLDER, file)
+
+        print(f"\nLoading: {file}")
+
+        loader = PyPDFLoader(pdf_path)
+        pages = loader.load()
+
+        print(f"Loaded {len(pages)} pages")
+
+        # Combine all pages
+        full_text = "\n".join(
+            page.page_content for page in pages
+        )
+
+        # Split by Q1., Q2., Q3. etc.
+        qa_sections = re.split(
+            r"(?=Q\d+\.)",
+            full_text
+        )
+
+        for section in qa_sections:
+
+            section = section.strip()
+
+            if section.startswith("Q"):
+
+                documents.append(
+                    Document(
+                        page_content=section,
+                        metadata={
+                            "source": file
+                        }
+                    )
+                )
+
+print(f"\nCreated {len(documents)} Q&A chunks")
+
+# ----------------------------------
+# EMBEDDINGS
+# ----------------------------------
 
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-print("Creating vector database...")
+print("\nCreating Vector DB...")
+
+# ----------------------------------
+# CREATE CHROMA DB
+# ----------------------------------
 
 vectordb = Chroma.from_documents(
-    documents=chunks,
+    documents=documents,
     embedding=embeddings,
     persist_directory=DB_DIR
 )
 
 vectordb.persist()
 
+print("\nVector DB Created Successfully!")
 print("Done!")
