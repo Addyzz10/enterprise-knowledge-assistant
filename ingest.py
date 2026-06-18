@@ -58,7 +58,8 @@ for file in os.listdir(PDF_FOLDER):
                     Document(
                         page_content=section,
                         metadata={
-                            "source": file
+                            "source": PDF_PATH,
+                            "page": page_number
                         }
                     )
                 )

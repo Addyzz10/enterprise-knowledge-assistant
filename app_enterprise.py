@@ -112,7 +112,7 @@ with st.sidebar:
         for meta in data["metadatas"]:
 
             if meta and "source" in meta:
-                pdfs.add(meta["source"])
+                pdfs.add(os.path.basename(meta["source"]))
 
         for pdf in sorted(pdfs):
             st.write(f"• {pdf}")
@@ -142,8 +142,8 @@ with st.sidebar:
 retriever = vectordb.as_retriever(
     search_type="mmr",
     search_kwargs={
-        "k": 2,
-        "fetch_k": 20
+        "k": 4,
+        "fetch_k": 40
     }
 )
 
@@ -272,11 +272,15 @@ if question:
 
                 for i, doc in enumerate(sources, start=1):
 
-                    source_name = doc.metadata.get(
-                        "source",
-                        "Unknown PDF"
+                    source_name = os.path.basename(
+                        doc.metadata.get(
+                            "source",
+                            "Unknown PDF"
+                        )
                     )
 
+                    page = doc.metadata.get("page", "N/A")
+                    
                     st.markdown(
                         f"### 📄 {source_name}"
                     )
