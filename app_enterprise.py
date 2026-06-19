@@ -95,6 +95,10 @@ def load_vectordb():
         embedding_function=embeddings,
         collection_name="langchain"
     )
+    
+import chromadb
+st.write("CHROMA VERSION:", chromadb.__version__) 
+
 vectordb = load_vectordb()
 # --------------------------------------------------
 # SIDEBAR
