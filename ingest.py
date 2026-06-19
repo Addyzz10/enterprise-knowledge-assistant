@@ -82,7 +82,8 @@ print("\nCreating Vector DB...")
 vectordb = Chroma.from_documents(
     documents=documents,
     embedding=embeddings,
-    persist_directory=DB_DIR
+    persist_directory=DB_DIR,
+    collection_name="langchain"
 )
 
 vectordb.persist()
