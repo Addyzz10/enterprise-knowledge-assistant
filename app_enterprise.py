@@ -54,6 +54,13 @@ st.markdown("""
 
 Ask questions across your enterprise knowledge base and retrieve grounded answers with source citations.
 """)
+
+st.info("""
+🚀 Enterprise AI Search
+
+Ask questions from multiple PDFs and receive grounded answers with source references.
+""")
+
 # --------------------------------------------------
 # CHAT HISTORY
 # --------------------------------------------------
@@ -101,37 +108,28 @@ with st.sidebar:
 
     st.divider()
 
-    st.subheader("📄 Loaded Documents")
+    st.subheader("💡 Example Questions")
 
-    try:
+    examples = [
+        "What is Dynamic Programming?",
+        "Explain Inner Join",
+        "What is Snowpark?",
+        "What is FastAPI?",
+        "What is RAG?"
+    ]
 
-        pdfs = set()
+    for ex in examples:
+        st.caption(f"• {ex}")
 
-        data = vectordb.get()
+    st.divider()
 
-        for meta in data["metadatas"]:
+    st.success(
+        """
+        Ask questions across your enterprise documents and get
+        grounded answers with source citations.
+        """
+    )
 
-            if meta and "source" in meta:
-                pdfs.add(os.path.basename(meta["source"]))
-
-        for pdf in sorted(pdfs):
-            st.write(f"• {pdf}")
-
-    except Exception:
-        st.write("No documents loaded")
-
-    st.subheader("📊 Knowledge Base")
-
-    try:
-        chunk_count = vectordb._collection.count()
-
-        st.metric(
-            "Chunks Indexed",
-            chunk_count
-        )
-
-    except Exception:
-        pass
 
 
 
@@ -140,10 +138,9 @@ with st.sidebar:
 # --------------------------------------------------
 
 retriever = vectordb.as_retriever(
-    search_type="mmr",
+    search_type="similarity",
     search_kwargs={
-        "k": 4,
-        "fetch_k": 40
+        "k": 3,
     }
 )
 
@@ -165,13 +162,16 @@ You are an Enterprise Knowledge Assistant.
 
 Rules:
 
-1. Use ONLY the provided context.
-2. Never invent information.
-3. If multiple sources contain useful information, combine them.
-4. Give a concise but complete answer.
-5. If the answer cannot be found in the context, respond exactly:
+1. Answer ONLY from the provided context.
+2. Do NOT use outside knowledge.
+3. If the answer is not explicitly present in the context, respond:
 
 I don't know.
+
+4. Do not guess.
+5. Do not infer.
+6. Do not make assumptions.
+7. Keep answers concise and factual.
 
 Context:
 {context}
@@ -239,7 +239,7 @@ if question:
 
             docs = retriever.get_relevant_documents(question)
 
-            if not docs:
+            if len(docs) == 0:
 
                 answer = "I don't know."
 
@@ -267,7 +267,7 @@ if question:
             st.caption(
                 f"⚡ Response generated in {elapsed} sec"
             )
-
+        if answer.strip().lower() != "i don't know.":
             with st.expander("📄 Sources"):
 
                 for i, doc in enumerate(sources, start=1):
@@ -279,16 +279,15 @@ if question:
                         )
                     )
 
-                    page = doc.metadata.get("page", "N/A")
                     
                     st.markdown(
                         f"### 📄 {source_name}"
                     )
 
                     st.text_area(
-                        label="",
-                        value=doc.page_content[:500],
-                        height=180,
+                        "",
+                        doc.page_content[:500],
+                        height=150,
                         disabled=True
                     )
 
