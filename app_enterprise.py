@@ -87,17 +87,14 @@ embeddings = load_embeddings()
 
 @st.cache_resource
 def load_vectordb():
-
-    if not os.path.exists("db"):
-        st.error("Vector database not found")
-        st.stop()
+    st.write("DB EXISTS:", os.path.exists("db"))
+    st.write("DB FILES:", os.listdir("db"))
 
     return Chroma(
         persist_directory="./db",
         embedding_function=embeddings,
         collection_name="langchain"
     )
-vectordb = load_vectordb()
 # --------------------------------------------------
 # SIDEBAR
 # --------------------------------------------------
