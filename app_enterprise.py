@@ -87,18 +87,25 @@ embeddings = load_embeddings()
 
 @st.cache_resource
 def load_vectordb():
+
     st.write("DB EXISTS:", os.path.exists("db"))
     st.write("DB FILES:", os.listdir("db"))
 
-    return Chroma(
-        persist_directory="./db",
-        embedding_function=embeddings
-    )
-    
-import chromadb
-st.write("CHROMA VERSION:", chromadb.__version__) 
+    try:
+        db = Chroma(
+            persist_directory="./db",
+            embedding_function=embeddings
+        )
 
-vectordb = load_vectordb()
+        st.success("VECTOR DB LOADED")
+        st.write("DOC COUNT:", db._collection.count())
+
+        return db
+
+    except Exception as e:
+        st.error(type(e).__name__)
+        st.code(str(e))
+        raise
 # --------------------------------------------------
 # SIDEBAR
 # --------------------------------------------------
