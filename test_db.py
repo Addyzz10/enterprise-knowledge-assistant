@@ -1,14 +1,13 @@
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-emb = HuggingFaceEmbeddings(
+embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
 db = Chroma(
     persist_directory="./db",
-    embedding_function=emb,
-    collection_name="langchain"
+    embedding_function=embeddings
 )
 
-print(db._collection.count())
+print("DOC COUNT:", db._collection.count())
