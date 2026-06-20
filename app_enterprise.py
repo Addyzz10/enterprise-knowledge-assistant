@@ -88,15 +88,19 @@ embeddings = load_embeddings()
 @st.cache_resource
 def load_vectordb():
 
-    db = Chroma(
-        persist_directory="db",
-        embedding_function=embeddings,
-        collection_name="langchain"
+    import chromadb
+
+    client = chromadb.PersistentClient(path="db")
+
+    collection = client.get_collection("langchain")
+
+    st.write("DOC COUNT:", collection.count())
+
+    return Chroma(
+        client=client,
+        collection_name="langchain",
+        embedding_function=embeddings
     )
-
-    return db
-
-vectordb = load_vectordb()
 # --------------------------------------------------
 # SIDEBAR
 # --------------------------------------------------
