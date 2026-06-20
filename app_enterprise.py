@@ -106,6 +106,11 @@ def load_vectordb():
         st.error(type(e).__name__)
         st.code(str(e))
         raise
+    
+import chromadb
+st.write("CHROMA VERSION:", chromadb.__version__)
+
+vectordb = load_vectordb()
 # --------------------------------------------------
 # SIDEBAR
 # --------------------------------------------------
