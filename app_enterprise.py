@@ -92,8 +92,7 @@ def load_vectordb():
 
     return Chroma(
         persist_directory="./db",
-        embedding_function=embeddings,
-        collection_name="langchain"
+        embedding_function=embeddings
     )
     
 import chromadb
