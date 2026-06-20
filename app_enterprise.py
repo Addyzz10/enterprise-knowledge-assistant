@@ -101,6 +101,7 @@ def load_vectordb():
         collection_name="langchain",
         embedding_function=embeddings
     )
+vectordb = load_vectordb()
 # --------------------------------------------------
 # SIDEBAR
 # --------------------------------------------------
