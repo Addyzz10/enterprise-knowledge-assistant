@@ -92,15 +92,14 @@ def load_vectordb():
     st.write("DB FILES:", os.listdir("db"))
 
     try:
-        db = Chroma(
-            persist_directory="./db",
-            embedding_function=embeddings
-        )
+        import chromadb
 
-        st.success("VECTOR DB LOADED")
-        st.write("DOC COUNT:", db._collection.count())
+        client = chromadb.PersistentClient(path="./db")
 
-        return db
+        st.write("COLLECTIONS:")
+        st.write(client.list_collections())
+
+        raise Exception("STOP HERE")
 
     except Exception as e:
         st.error(type(e).__name__)
