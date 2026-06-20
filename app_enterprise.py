@@ -88,26 +88,13 @@ embeddings = load_embeddings()
 @st.cache_resource
 def load_vectordb():
 
-    st.write("DB EXISTS:", os.path.exists("db"))
-    st.write("DB FILES:", os.listdir("db"))
+    db = Chroma(
+        persist_directory="db",
+        embedding_function=embeddings,
+        collection_name="langchain"
+    )
 
-    try:
-        import chromadb
-
-        client = chromadb.PersistentClient(path="./db")
-
-        st.write("COLLECTIONS:")
-        st.write(client.list_collections())
-
-        raise Exception("STOP HERE")
-
-    except Exception as e:
-        st.error(type(e).__name__)
-        st.code(str(e))
-        raise
-    
-import chromadb
-st.write("CHROMA VERSION:", chromadb.__version__)
+    return db
 
 vectordb = load_vectordb()
 # --------------------------------------------------
