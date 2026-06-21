@@ -158,7 +158,13 @@ llm = ChatGroq(
     groq_api_key=os.getenv("GROQ_API_KEY"),
     model_name="llama-3.1-8b-instant"
 )
+import groq
+import httpx
+import openai
 
+st.write("groq:", groq.__version__)
+st.write("httpx:", httpx.__version__)
+st.write("openai:", openai.__version__)
 # --------------------------------------------------
 # STRICT RAG PROMPT
 # --------------------------------------------------
