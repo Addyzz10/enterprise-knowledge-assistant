@@ -87,6 +87,10 @@ embeddings = load_embeddings()
 @st.cache_resource
 def load_vectordb():
 
+    import os
+
+    st.write("DB EXISTS:", os.path.exists("db"))
+
     db = Chroma(
         persist_directory="db",
         embedding_function=embeddings,
