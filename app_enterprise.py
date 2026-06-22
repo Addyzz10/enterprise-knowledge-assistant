@@ -266,21 +266,6 @@ if question:
 
         with st.spinner("Searching knowledge base..."):
 
-            if len(docs) == 0:
-
-                answer = "I don't know."
-
-                st.markdown(answer)
-
-                st.session_state.messages.append(
-                    {
-                        "role": "assistant",
-                        "content": answer
-                    }
-                )
-
-                st.stop()
-
             start = time.time()
             result = qa({"query": question})
 
