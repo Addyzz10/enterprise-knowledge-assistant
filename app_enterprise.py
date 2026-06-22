@@ -49,11 +49,20 @@ div[data-testid="stChatMessage"] {
 # TITLE
 # --------------------------------------------------
 
-st.markdown("""
-# 📚 AskMA Knowledge Assistant
+col1, col2 = st.columns([1, 8])
 
-Ask questions about MA-IN processes, inventory, planning, logistics and operational documentation.
-""")
+with col1:
+    st.image(
+        "assets/bosch-logo.png",
+        width=90
+    )
+    
+with col2:
+    st.markdown("""
+        # AskMA Knowledge Assistant
+
+        Ask questions about MA-IN processes, inventory, planning, logistics and operational documentation.
+        """)
 
 st.info("""
 🚀 Enterprise AI Search
@@ -118,8 +127,8 @@ with st.sidebar:
         "What is Inventory?",
         "What is S&OP?",
         "What is Safety Stock?",
-        "What is Good Stock?",
-        "What is Bad Stock?"
+        "Explain Make To Stock (MTS)",
+        "Explain Good Stock vs Bad Stock"
     ]
 
     for ex in examples:
@@ -144,7 +153,7 @@ with st.sidebar:
 retriever = vectordb.as_retriever(
     search_type="similarity",
     search_kwargs={
-        "k": 5,
+        "k": 8,
     }
 )
 
