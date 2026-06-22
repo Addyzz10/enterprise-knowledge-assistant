@@ -49,20 +49,11 @@ div[data-testid="stChatMessage"] {
 # TITLE
 # --------------------------------------------------
 
-col1, col2 = st.columns([1, 8])
+st.markdown("""
+# 📚 AskMA Knowledge Assistant
 
-with col1:
-    st.image(
-        "assets/bosch-logo.png",
-        width=90
-    )
-    
-with col2:
-    st.markdown("""
-        # AskMA Knowledge Assistant
-
-        Ask questions about MA-IN processes, inventory, planning, logistics and operational documentation.
-        """)
+Ask questions about MA-IN processes, inventory, planning, logistics and operational documentation.
+""")
 
 st.info("""
 🚀 Enterprise AI Search
