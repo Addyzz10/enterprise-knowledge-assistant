@@ -16,7 +16,7 @@ load_dotenv()
 # --------------------------------------------------
 
 st.set_page_config(
-    page_title="Enterprise Knowledge Assistant",
+    page_title="AskMA Knowledge Assistant",
     page_icon="📚",
     layout="wide"
 )
@@ -50,9 +50,9 @@ div[data-testid="stChatMessage"] {
 # --------------------------------------------------
 
 st.markdown("""
-# 📚 Enterprise Knowledge Assistant
+# 📚 AskMA Knowledge Assistant
 
-Ask questions across your enterprise knowledge base and retrieve grounded answers with source citations.
+Ask questions about MA-IN processes, inventory, planning, logistics and operational documentation.
 """)
 
 st.info("""
@@ -89,14 +89,12 @@ def load_vectordb():
 
     import os
 
-    st.write("DB EXISTS:", os.path.exists("db"))
-
     db = Chroma(
         persist_directory="db",
         embedding_function=embeddings,
         collection_name="langchain"
     )
-    st.write("Documents in DB:", db._collection.count())
+    
     return db
 
 vectordb = load_vectordb()
@@ -114,14 +112,14 @@ with st.sidebar:
 
     st.divider()
 
-    st.subheader("💡 Example Questions")
+    st.subheader("💡 AskMA Examples")
 
     examples = [
-        "What is Dynamic Programming?",
-        "Explain Inner Join",
-        "What is Snowpark?",
-        "What is FastAPI?",
-        "What is RAG?"
+        "What is Inventory?",
+        "What is S&OP?",
+        "What is Safety Stock?",
+        "What is Good Stock?",
+        "What is Bad Stock?"
     ]
 
     for ex in examples:
@@ -159,18 +157,13 @@ import httpx
 import langchain
 import langchain_core
 
-st.write("groq:", groq.__version__)
-st.write("httpx:", httpx.__version__)
-st.write("langchain:", langchain.__version__)
-st.write("langchain_core:", langchain_core.__version__)
-st.write("GROQ_API_KEY exists:", bool(os.getenv("GROQ_API_KEY")))
 try:
     llm = ChatGroq(
         groq_api_key=os.getenv("GROQ_API_KEY"),
         model_name="llama-3.3-70b-versatile",
         temperature=0
     )
-    st.success("ChatGroq initialized")
+    
 except Exception as e:
     st.error(f"ChatGroq Error: {e}")
     st.stop()
@@ -179,7 +172,7 @@ except Exception as e:
 # --------------------------------------------------
 
 prompt_template = """
-You are an Enterprise Knowledge Assistant.
+You are an AskMA Knowledge Assistant.
 
 Your task is to answer questions ONLY using the provided context.
 
@@ -280,9 +273,10 @@ if question:
                 f"⚡ Response generated in {elapsed} sec"
             )
         if answer.strip().lower() != "i don't know.":
-            with st.expander("📄 Sources"):
+            with st.expander("📚 Source Documents"):
 
-                for i, doc in enumerate(sources, start=1):
+                shown_files = set()
+                for doc in sources:
 
                     source_name = os.path.basename(
                         doc.metadata.get(
@@ -290,20 +284,12 @@ if question:
                             "Unknown PDF"
                         )
                     )
+                    if source_name not in shown_files:
+                        shown_files.add(source_name) 
+                        st.markdown(
+                        f"✅ {source_name}"
+                        )
 
-                    
-                    st.markdown(
-                        f"### 📄 {source_name}"
-                    )
-
-                    st.text_area(
-                        "",
-                        doc.page_content[:500],
-                        height=150,
-                        disabled=True
-                    )
-
-                    st.divider()
 
     st.session_state.messages.append(
         {
