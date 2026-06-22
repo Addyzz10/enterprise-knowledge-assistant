@@ -96,7 +96,7 @@ def load_vectordb():
         embedding_function=embeddings,
         collection_name="langchain"
     )
-
+    st.write("Documents in DB:", db._collection.count())
     return db
 
 vectordb = load_vectordb()
@@ -258,7 +258,11 @@ if question:
         with st.spinner("Searching knowledge base..."):
 
             docs = retriever.get_relevant_documents(question)
+            st.write("Retrieved Docs:", len(docs))
 
+            for i, doc in enumerate(docs):
+                st.write(f"Doc {i+1}")
+                st.write(doc.page_content[:300])
             if len(docs) == 0:
 
                 answer = "I don't know."
