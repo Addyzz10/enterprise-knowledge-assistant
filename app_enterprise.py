@@ -146,7 +146,7 @@ with st.sidebar:
 retriever = vectordb.as_retriever(
     search_type="similarity",
     search_kwargs={
-        "k": 3,
+        "k": 5,
     }
 )
 
@@ -167,7 +167,8 @@ st.write("GROQ_API_KEY exists:", bool(os.getenv("GROQ_API_KEY")))
 try:
     llm = ChatGroq(
         groq_api_key=os.getenv("GROQ_API_KEY"),
-        model_name="llama-3.1-8b-instant"
+        model_name="llama-3.3-70b-versatile",
+        temperature=0
     )
     st.success("ChatGroq initialized")
 except Exception as e:
@@ -180,18 +181,25 @@ except Exception as e:
 prompt_template = """
 You are an Enterprise Knowledge Assistant.
 
+Your task is to answer questions ONLY using the provided context.
+
 Rules:
 
-1. Answer ONLY from the provided context.
-2. Do NOT use outside knowledge.
-3. If the answer is not explicitly present in the context, respond:
+1. Use ONLY the information available in the context.
+2. Do NOT use external knowledge.
+3. Do NOT guess or make assumptions.
+4. If the answer is not available in the context, respond exactly:
 
 I don't know.
 
-4. Do not guess.
-5. Do not infer.
-6. Do not make assumptions.
-7. Keep answers concise and factual.
+5. When the answer exists in the context:
+   - Provide a complete answer.
+   - Combine information from multiple retrieved chunks if needed.
+   - Use clear and professional language.
+   - Summarize repetitive information.
+   - Do not simply copy large portions of the context.
+
+6. If the context contains partial information, provide all relevant information that is available.
 
 Context:
 {context}
@@ -213,6 +221,7 @@ PROMPT = PromptTemplate(
 
 qa = RetrievalQA.from_chain_type(
     llm=llm,
+    chain_type="stuff",
     retriever=retriever,
     return_source_documents=True,
     chain_type_kwargs={
@@ -257,12 +266,6 @@ if question:
 
         with st.spinner("Searching knowledge base..."):
 
-            docs = retriever.get_relevant_documents(question)
-            st.write("Retrieved Docs:", len(docs))
-
-            for i, doc in enumerate(docs):
-                st.write(f"Doc {i+1}")
-                st.write(doc.page_content[:300])
             if len(docs) == 0:
 
                 answer = "I don't know."

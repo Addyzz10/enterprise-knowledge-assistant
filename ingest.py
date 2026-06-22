@@ -46,8 +46,8 @@ for file in os.listdir(PDF_FOLDER):
         # Split by Q1., Q2., Q3. etc.
         
         splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200
+            chunk_size=700,
+            chunk_overlap=100
         )
 
         chunks = splitter.split_text(full_text)
