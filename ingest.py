@@ -2,6 +2,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 import re
 import shutil
 import os
@@ -43,27 +44,27 @@ for file in os.listdir(PDF_FOLDER):
         )
 
         # Split by Q1., Q2., Q3. etc.
-        qa_sections = re.split(
-            r"(?=Q\d+\.)",
-            full_text
+        
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200
         )
 
-        for section in qa_sections:
+        chunks = splitter.split_text(full_text)
+        
+        print(f"Created {len(chunks)} chunks from {file}")
 
-            section = section.strip()
-
-            if section.startswith("Q"):
-
+        for chunk in chunks:
                 documents.append(
                     Document(
-                        page_content=section,
+                        page_content=chunk,
                         metadata={
-                            "source": file,
+                            "source": file
                         }
                     )
                 )
 
-print(f"\nCreated {len(documents)} Q&A chunks")
+print(f"\nCreated {len(documents)} chunks")
 
 # ----------------------------------
 # EMBEDDINGS
