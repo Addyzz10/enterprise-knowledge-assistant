@@ -154,17 +154,27 @@ retriever = vectordb.as_retriever(
 # LLM
 # --------------------------------------------------
 
-llm = ChatGroq(
-    groq_api_key=os.getenv("GROQ_API_KEY"),
-    model_name="llama-3.1-8b-instant"
-)
 import groq
 import httpx
 import openai
+import langchain
+import langchain_core
 
 st.write("groq:", groq.__version__)
 st.write("httpx:", httpx.__version__)
 st.write("openai:", openai.__version__)
+st.write("langchain:", langchain.__version__)
+st.write("langchain_core:", langchain_core.__version__)
+st.write("GROQ_API_KEY exists:", bool(os.getenv("GROQ_API_KEY")))
+try:
+    llm = ChatGroq(
+        groq_api_key=os.getenv("GROQ_API_KEY"),
+        model_name="llama-3.1-8b-instant"
+    )
+    st.success("ChatGroq initialized")
+except Exception as e:
+    st.error(f"ChatGroq Error: {e}")
+    st.stop()
 # --------------------------------------------------
 # STRICT RAG PROMPT
 # --------------------------------------------------
